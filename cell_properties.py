@@ -65,7 +65,7 @@ class PyramidalCell:
         self.soma.cm, self.soma.Ra = 1.0, 200
         self.apic1.cm, self.apic1.Ra = 1.0, 200
         self.apic2.cm, self.apic2.Ra = 1.0, 200
-        self.apic3.cm, self.apic3.Ra = 1.0, 200
+        self.apic3.cm, self.apic3.Ra = 1.0, 200 #resistance is ebtween 100-250
         self.tuft1.cm, self.tuft1.Ra = 1.5, 200
         self.tuft2.cm, self.tuft2.Ra = 1.5, 200
 
