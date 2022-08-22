@@ -62,14 +62,14 @@ nc.delay = 0  # synaptic delay (ms)
 nc.weight[0] = 0.002  # synaptic weight (strength) - importance of synapse in overall potential 
 
 
-vsoma_vec = h.Vector().record(new_cell.soma(0.5)._ref_v)  # Membrane potential vector
-vtrunk4_vec = h.Vector().record(new_cell.trunk4(0.5)._ref_v)  # Membrane potential vector
+vsoma_vec = h.Vector().record(cell_0.soma(0.5)._ref_v)  # Membrane potential vector
+vtrunk4_vec = h.Vector().record(cell_0.trunk3(0.5)._ref_v)  # Membrane potential vector
 t_vec = h.Vector().record(h._ref_t)  # Time stamp vector
 
 
-vsoma_vec_2 = h.Vector().record(new_cell2.soma(0.5)._ref_v)
-vtrunk4_vec_2 = h.Vector().record(new_cell2.trunk3(0.5)._ref_v)
-#t_vec_2 = h.Vector().record(h._ref_t)
+vsoma_vec_2 = h.Vector().record(cell_1.soma(0.5)._ref_v)
+vtrunk4_vec_2 = h.Vector().record(cell_1.trunk3(0.5)._ref_v)
+
 
 # Run the simulation
 h.finitialize(vinit)
