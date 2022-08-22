@@ -9,7 +9,7 @@ cell_3 = PyramidalCell(3)
 cell_4 = PyramidalCell(4)
 
 #create a new synapse on cell 2 that will connect cell 1 and t 
-syn_xxx = h.ExpSyn(new_cell2.trunk3(0.5))
+syn_1 = h.ExpSyn(cell_0.trunk3(0.5))
 
 #create a netcon object through which cell 1 and 2 will be connected - through syn_xxx
 ncon_xxx = h.NetCon(new_cell.soma(0.5)._ref_v, syn_xxx, sec=new_cell.soma)

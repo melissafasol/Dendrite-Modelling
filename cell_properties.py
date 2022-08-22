@@ -11,97 +11,96 @@ h.load_file("stdrun.hoc")
 
 class PyramidalCell:
   def __init__(self, gid):
-    self._gid = gid
-    self._setup_morphology()
-    self._setup_topology()
-    self._create_lists()
-    self._setup_geometry()
-    self._setup_passive()
-    self._setup_segments()
-    self._setup_biophysics()
+        self._gid = gid
+        self._setup_morphology()
+        self._setup_topology()
+        self._create_lists()
+        self._setup_geometry()
+        self._setup_passive()
+        self._setup_segments()
+        self._setup_biophysics()
 
-  def geom_nseg(self, section, f=100):
-    return int((section.L/(0.1*h.lambda_f(f)) + 0.9)/2)*2 + 1
+        self._spike_detector = h.NetCon(self.soma(0.5)._ref_v, None, sec=self.soma)
+        self.spike_times = h.Vector()
+        self._spike_detector.record(self.spike_times)
+        self._ncs = []
+
+        self.soma_v = h.Vector().record(self.soma(0.5)._ref_v)
+        self.dend_v = h.Vector().record(self.apic3(0.5)._ref_v)
+
+
+  def _geom_nseg(self, section, f=100):
+        return int((section.L/(0.1*h.lambda_f(f)) + 0.9)/2)*2 + 1
 
   def _setup_morphology(self):
-    self.soma = h.Section(name='soma', cell=self)
-    self.trunk0 = h.Section(name='trunk0', cell=self)
-    self.trunk1 = h.Section(name='trunk1', cell=self)
-    self.trunk2 = h.Section(name='trunk2', cell=self)
-    self.trunk3 = h.Section(name='trunk3', cell=self)
-    self.trunk4 = h.Section(name='trunk4', cell=self)
-    self.tuft0 = h.Section(name='tuft0', cell=self)
-    self.tuft1 = h.Section(name='tuft1', cell=self)
+        self.soma = h.Section(name='soma', cell=self)
+        self.apic1 = h.Section(name='apic1', cell=self)
+        self.apic2 = h.Section(name='apic2', cell=self)
+        self.apic3 = h.Section(name='apic3', cell=self)
+        self.tuft1 = h.Section(name='tuft1', cell=self)
+        self.tuft2 = h.Section(name='tuft2', cell=self)
 
   def _create_lists(self):
-    self.all = self.soma.wholetree()
-    self.trunk = [sec for sec in self.all if sec.name().__contains__('trunk')]
-    self.tuft = [sec for sec in self.all if sec.name().__contains__('tuft')]
+        self.all = self.soma.wholetree()
+        self.apic = [sec for sec in self.all if sec.name().__contains__('apic')]
+        self.tuft = [sec for sec in self.all if sec.name().__contains__('tuft')]
 
   def _setup_topology(self):
-    # Connect sections
-    self.trunk0.connect(self.soma(0.5))
-    self.trunk1.connect(self.trunk0(1))
-    self.trunk2.connect(self.trunk1(1))
-    self.trunk3.connect(self.trunk2(1))
-    self.trunk4.connect(self.trunk3(1))
-    self.tuft0.connect(self.trunk4(1))
-    self.tuft1.connect(self.trunk4(1))
+        # Connect sections
+        self.apic1.connect(self.soma(1))
+        self.apic2.connect(self.apic1(1))
+        self.apic3.connect(self.apic2(1))
+        self.tuft1.connect(self.apic3(1))
+        self.tuft2.connect(self.apic3(1))
 
   def _setup_geometry(self):
-    self.soma.L = self.soma.diam = 20 * um
-
-    diams = [3, 2.5, 2, 1.5, 1.2]  # reducing diameters as we are distal from the soma
-    for i, sec in enumerate(self.trunk):
-      sec.diam = diams[i]  # diameter (um)
-      sec.L = 120 if i < 4 else 20  # length (um)
-
-    for i, sec in enumerate(self.tuft):
-      sec.L = 100 * um
-      sec.diam = 1.0 * um
+        self.soma.L = self.soma.diam = 10 * um
+        self.apic1.L, self.apic1.diam = 80 * um, 2.5 * um
+        self.apic2.L, self.apic2.diam = 70 * um, 2.0 * um
+        self.apic3.L, self.apic3.diam = 50 * um, 1.5 * um
+        self.tuft1.L, self.tuft1.diam = 50 * um, 1.0 * um
+        self.tuft2.L, self.tuft2.diam = 50 * um, 1.0 * um
 
   def _setup_passive(self):
-    for sec in self.all:
-      sec.cm = 1  # specific membrane capacitance (uF/cm2)
-      sec.Ra = 100  # Axial resistance (Ohm * cm)
+        self.soma.cm, self.soma.Ra = 1.0, 200
+        self.apic1.cm, self.apic1.Ra = 1.0, 200
+        self.apic2.cm, self.apic2.Ra = 1.0, 200
+        self.apic3.cm, self.apic3.Ra = 1.0, 200
+        self.tuft1.cm, self.tuft1.Ra = 1.5, 200
+        self.tuft2.cm, self.tuft2.Ra = 1.5, 200
 
   def _setup_biophysics(self):
 
-    # Somatic compartment
-    self.soma.insert('hh')
-    for seg in self.soma: 
-      seg.hh.gnabar = 0.12  # Sodium conductance (S/cm2)
-      seg.hh.gkbar = 0.025  # Potassium conductance (S/cm2)
-      seg.hh.gl = 0.00025  # Leak conductance (S/cm2)
-      seg.hh.el = -65  # Reversal potential (mV)
+        # Somatic compartment
+        self.soma.insert('hh')
 
-    # Trunk compartments
-    for sec in self.trunk:
-      sec.insert('pas')
-      for seg in sec:
-        seg.pas.e = -65  # leak reversal potential (mV)
-        seg.pas.g = 0.00025  # leak maximal conductance (S/cm2)
-    
-    # Add calcium mechanisms in `trunk4` section
-    self.trunk4.insert('cad')
-    self.trunk4.insert('sca')
-    for seg in self.trunk4:
-      seg.sca.gcabar = 0.35  # Ca2+ maximal conductance (S/cm2)
-    
-    # tuft compartments
-    for sec in self.tuft:
-      sec.insert('pas')
-      for seg in sec:
-        seg.pas.e = -65  # leak reversal potential (mV)
-        seg.pas.g = 0.00025  # leak maximal conductance (S/cm2)
+        for sec in self.apic:
+            sec.insert('hh')
+            for seg in sec:
+                seg.hh.gnabar = 0.01
+                seg.hh.gkbar = 0.001
+        for sec in self.tuft:
+            sec.insert('pas')
+            for seg in sec:
+                seg.pas.g = 1/20000
+
+        # NEW: the synapse
+        self.syn1 = h.Exp2Syn(self.tuft1(0.5))
+        self.syn1.tau1 = 0.5
+        self.syn1.tau2 = 10
+
+        self.syn2 = h.Exp2Syn(self.tuft2(0.5))
+        self.syn2.tau1 = 0.5
+        self.syn2.tau2 = 10
 
   def _setup_segments(self):
-    # Create segments based on `lambda_f`
-    for sec in self.all:
-      sec.nseg = self.geom_nseg(sec)
+        # Create segments based on `lambda_f`
+        for sec in self.all:
+            sec.nseg = self._geom_nseg(section=sec)
 
   def __repr__(self):
-    return 'PyramidalCell[{}]'.format(self._gid)
+        return 'MyCell[{}]'.format(self._gid)
+
 
 
 class InhibitoryCell():
