@@ -1,4 +1,5 @@
 import neuron 
+from neuron import h
 import numpy as np 
 from cell_properties import PyramidalCell
 import random 
