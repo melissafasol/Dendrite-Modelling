@@ -112,67 +112,65 @@ class InhibitoryCell:
         self._setup_segments()
         self._setup_biophysics()
 
-        def geom_nseg(self, section, f=100):
-            return int((section.L/(0.1*h.lambda_f(f)) + 0.9)/2)*2 + 1
+    def geom_nseg(self, section, f=100):
+        return int((section.L/(0.1*h.lambda_f(f)) + 0.9)/2)*2 + 1
 
-        def _setup_morphology(self):
-            self.soma = h.Section(name='soma', cell=self)
-            self.dendrite1 = h.Section(name='dendrite1', cell=self)
-            self.dendrite2 = h.Section(name='dendrite2', cell=self)
-        
+    def _setup_morphology(self):
+        self.soma = h.Section(name='soma', cell=self)
+        self.dendrite1 = h.Section(name='dendrite1', cell=self)
+        self.dendrite2 = h.Section(name='dendrite2', cell=self)
 
-        def _create_lists(self):
-            self.all = self.soma.wholetree()
-            self.dendrite = [sec for sec in self.all if sec.name().__contains__('dendrite')]
+    def _create_lists(self):
+        self.all = self.soma.wholetree()
+        self.dendrite = [sec for sec in self.all if sec.name().__contains__('dendrite')]
 
-        def _setup_topology(self):
+    def _setup_topology(self):
         # Connect sections
-            self.dendrite1.connect(self.soma(0.5))
-            self.dendrite2.connect(self.soma(0.5))
+        self.dendrite1.connect(self.soma(0.5))
+        self.dendrite2.connect(self.soma(0.5))
 
+    def _setup_geometry(self):
+        self.soma.L = self.soma.diam = 20 * um
 
-        def _setup_geometry(self):
-            self.soma.L = self.soma.diam = 20 * um
-
-        diams = [3, 2.5, 2, 1.5, 1.2]  # reducing diameters as we are distal from the soma
+        diams = [2, 1.5]  # reducing diameters as we are distal from the soma
         for i, sec in enumerate(self.dendrite):
             sec.diam = diams[i]  # diameter (um)
-            sec.L = 120 if i < 4 else 20  # length (um)
+            sec.L = 120  # length (um)
 
-        def _setup_passive(self):
-            for sec in self.all:
-                sec.cm = 1  # specific membrane capacitance (uF/cm2)
-                sec.Ra = 100  # Axial resistance (Ohm * cm)
+    def _setup_passive(self):
+        for sec in self.all:
+            sec.cm = 1  # specific membrane capacitance (uF/cm2)
+            sec.Ra = 100  # Axial resistance (Ohm * cm)
 
-        def _setup_biophysics(self):
-             # Somatic compartment
-            self.soma.insert('hh')
-            for seg in self.soma: 
-                seg.hh.gnabar = 0.12  # Sodium conductance (S/cm2)
-                seg.hh.gkbar = 0.025  # Potassium conductance (S/cm2)
-                seg.hh.gl = 0.00025  # Leak conductance (S/cm2)
-                seg.hh.el = -65  # Reversal potential (mV)
+    def _setup_biophysics(self):
+        # Somatic compartment
+        self.soma.insert('hh')
+        for seg in self.soma: 
+            seg.hh.gnabar = 0.12  # Sodium conductance (S/cm2)
+            seg.hh.gkbar = 0.025  # Potassium conductance (S/cm2)
+            seg.hh.gl = 0.00025  # Leak conductance (S/cm2)
+            seg.hh.el = -65  # Reversal potential (mV)
 
         # Somatic compartment
-            self.soma.insert('hh')
-            for seg in self.soma: 
-                seg.hh.gnabar = 0.12  # Sodium conductance (S/cm2)
-                seg.hh.gkbar = 0.025  # Potassium conductance (S/cm2)
-                seg.hh.gl = 0.00025  # Leak conductance (S/cm2)
-                seg.hh.el = -65  # Reversal potential (mV)
+        self.soma.insert('hh')
+        for seg in self.soma: 
+            seg.hh.gnabar = 0.12  # Sodium conductance (S/cm2)
+            seg.hh.gkbar = 0.025  # Potassium conductance (S/cm2)
+            seg.hh.gl = 0.00025  # Leak conductance (S/cm2)
+            seg.hh.el = -65  # Reversal potential (mV)
 
-            # Dendrite compartments
-            for sec in self.dendrite:
-                sec.insert('pas')
-            for seg in sec:
-                seg.pas.e = -65  # leak reversal potential (mV)
-                seg.pas.g = 0.00025  # leak maximal conductance (S/cm2)
+        # Dendrite compartments
+        for sec in self.dendrite:
+            sec.insert('pas')
+        for seg in sec:
+            seg.pas.e = -65  # leak reversal potential (mV)
+            seg.pas.g = 0.00025  # leak maximal conductance (S/cm2)
 
 
-            def _setup_segments(self):
-            # Create segments based on `lambda_f`
-                for sec in self.all:
-                    sec.nseg = self.geom_nseg(sec)
+    def _setup_segments(self):
+        # Create segments based on `lambda_f`
+        for sec in self.all:
+            sec.nseg = self.geom_nseg(sec)
 
-            def __repr__(self):
-                return 'InhibitoryCell[{}]'.format(self._gid)
+    def __repr__(self):
+        return 'InhibitoryCell[{}]'.format(self._gid)

@@ -36,21 +36,21 @@ def poisson_spikes(t1, t2, N, rate=10, dt=0.1):
 pre_cells = 10000
 spks = poisson_spikes(t1=0, t2=1000, N=pre_cells, rate=25)
 
-plt.figure(figsize=(12, 8))
+#plt.figure(figsize=(12, 8))
 for i, r in enumerate(np.random.choice(pre_cells, 100, replace=False)):
   spks_i = spks[spks[:, 0] == r][:,1]
-  plt.scatter(spks_i, i*np.ones((len(spks_i), )), color='k')
-plt.ylabel('neuron id')
-plt.xlabel('time (ms)')
-plt.show()
+  #plt.scatter(spks_i, i*np.ones((len(spks_i), )), color='k')
+#plt.ylabel('neuron id')
+#plt.xlabel('time (ms)')
+#plt.show()
 
 freqs = []
 for i in range(pre_cells):
   spks_i = spks[spks[:, 0] == i][:, 1]
   freqs.append(len(spks_i))
 
-plt.figure(figsize=(12, 8))
-plt.hist(freqs, bins=20)
-plt.ylabel('neuron id')
-plt.xlabel('time (ms)')
-plt.show()
+# plt.figure(figsize=(12, 8))
+# plt.hist(freqs, bins=20)
+# plt.ylabel('neuron id')
+# plt.xlabel('time (ms)')
+# plt.show()

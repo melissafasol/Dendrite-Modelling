@@ -22,3 +22,11 @@
 	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
+./vecstim.c: ../vecstim.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "vecstim.mod" -o "/Users/melissafasol/Desktop/Dendrite Modelling/arm64")
+
+./vecstim.o: ./vecstim.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
