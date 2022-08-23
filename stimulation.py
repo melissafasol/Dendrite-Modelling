@@ -1,8 +1,9 @@
-from cell_properties import PyramidalCell
+from cell_properties import PyramidalCell, InhibitoryCell
 import neuron
 from neuron import h
 import matplotlib.pyplot as plt
 import os
+from spike_trains import poisson_spikes
 
 # Simulation parameters	
 tstop = 1600 #* ms simulation time (ms)
@@ -66,11 +67,23 @@ ic.dur = 5  # ms
 ic.amp = 0.000  # nA
 
 #========== ...create an artificial spike (an "event" to be delivered to the synapse)...
+#poisson generated spikes 
+#spikes = poisson_spikes(t1 = 0, t2 = tstop, N=1, rate=25)
+#input_spikes_as_list = spikes[spikes[:,0]==0][:, 1] #takes first column of vector object as a list
+
+
 tsignal = 20
 ns = h.NetStim(0.5) # do you input the spike vector here?
 ns.start = 200  # stimulus onset
 ns.number = 20  # number of events
 ns.noise = 0.5
+
+# vs = h.Vector(input_spikes_as_list)
+# vstim = h.VectStim()
+# vs.start = 200  # stimulus onset
+# vs.number = 20  # number of events
+# vs.noise = 0.5
+
 
 stim1 = h.NetCon(ns, apic_synapses[0])
 stim1.weight[0] = 0.0001*8 #if weight is less than than 8 then spikes do not fire 
@@ -84,6 +97,13 @@ for i in range(len(apic_synapses)):
 
 dend_recording = h.Vector().record(pyr_cells[0].tuft1(0.5)._ref_v)
 t_vec = h.Vector().record(h._ref_t)  # Time stamp vector
+
+
+# for i in range(5):  #list to test what happens if active currents are taken out and only passive currents remain
+#     for sec in pyr_cells[i].apic:
+#         for seg in sec:
+#             seg.hh.gnabar = 0 
+#             seg.hh.gkbar = 0
 
 # Run the simulation
 h.finitialize(vinit)
