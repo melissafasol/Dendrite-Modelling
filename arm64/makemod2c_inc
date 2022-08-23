@@ -6,3 +6,19 @@
 	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
+./nmda.c: ../nmda.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "nmda.mod" -o "/Users/melissafasol/Desktop/Dendrite Modelling/arm64")
+
+./nmda.o: ./nmda.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
+./sca.c: ../sca.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "sca.mod" -o "/Users/melissafasol/Desktop/Dendrite Modelling/arm64")
+
+./sca.o: ./sca.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
