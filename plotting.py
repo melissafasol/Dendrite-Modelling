@@ -1,5 +1,6 @@
 import matplotlib as plt 
 import seaborn as sns
+import numpy as np
 
 # @title Make nicer plots -- Execute this cell
 def mystyle():
