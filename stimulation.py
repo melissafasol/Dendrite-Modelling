@@ -17,9 +17,9 @@ cell_4 = PyramidalCell(4)
 #create a new synapse on cell 2 that will connect cell 1 and t 
 #put synapse of cell 0 on apical dendrites 
 syn_0 = h.ExpSyn(cell_0.apic1(0.5)) #two synapses - one with x_syn and one with NMDA
-syn_0_NMDA = h.NMDA(cell_0.tuft(0.5))
+syn_0_NMDA = h.NMDA(cell_0.tuft1(0.5))
 syn_1 = h.ExpSyn(cell_1.apic1(0.5))
-syn_1_NMDA = h.NMDA(cell_1.tuft(0.5))
+syn_1_NMDA = h.NMDA(cell_1.tuft1(0.5))
 syn_2 = h.ExpSyn(cell_2.apic1(0.5))
 syn_2_NMDA = h.NMDA(cell_2.tuft1(0.5))
 syn_3 = h.ExpSyn(cell_3.apic1(0.5))
@@ -116,7 +116,6 @@ cell_4_soma_vec = h.Vector().record(cell_4.soma(0.5)._ref_v)
 
 t_vec = h.Vector().record(h._ref_t)  # Time stamp vector
 
-
 # Run the simulation
 h.finitialize(vinit)
 h.continuerun(tstop)
@@ -124,28 +123,18 @@ h.continuerun(tstop)
 # Remove the first 20ms to avoid artifacts
 tremove = 20
 cell_0_soma_vec.remove(0, int(tremove/h.dt))
-cell_0_trunk3_vec.remove(0, int(tremove/h.dt))
 cell_1_soma_vec.remove(0, int(tremove/h.dt))
-cell_1_trunk3_vec.remove(0, int(tremove/h.dt))
 cell_2_soma_vec.remove(0, int(tremove/h.dt))
-cell_2_trunk3_vec.remove(0, int(tremove/h.dt))
 cell_3_soma_vec.remove(0, int(tremove/h.dt))
-cell_3_trunk3_vec.remove(0, int(tremove/h.dt))
 cell_4_soma_vec.remove(0, int(tremove/h.dt))
-cell_4_trunk3_vec.remove(0, int(tremove/h.dt))
 t_vec.remove(0, int(tremove/h.dt))
 
 plt.figure(figsize=(8, 6))
 plt.plot(t_vec, cell_0_soma_vec, label='soma 0 ')
-plt.plot(t_vec, cell_0_trunk3_vec, label='dendrite 0')
 plt.plot(t_vec, cell_1_soma_vec, label='soma 1')
-plt.plot(t_vec, cell_1_trunk3_vec, label='dendrite 1')
-plt.plot(t_vec, cell_2_soma_vec, label='soma 2 ')
-plt.plot(t_vec, cell_2_trunk3_vec, label='dendrite 2')
+plt.plot(t_vec, cell_2_soma_vec, label='soma 2')
 plt.plot(t_vec, cell_3_soma_vec, label='soma 3')
-plt.plot(t_vec, cell_3_trunk3_vec, label='dendrite 3')
 plt.plot(t_vec, cell_4_soma_vec, label='soma 4')
-plt.plot(t_vec, cell_4_trunk3_vec, label='dendrite 4')
 
 plt.xlabel('time (ms)')
 plt.ylabel('mV')
